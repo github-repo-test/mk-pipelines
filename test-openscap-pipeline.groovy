@@ -53,7 +53,7 @@ node('python') {
     }
 
     stage ('Run openscap xccdf evaluation and attempt to upload the results to a dashboard') {
-        liveMinions = salt.GetMinions(pepperEnv, targetServers)
+        liveMinions = salt.getMinions(pepperEnv, targetServers)
 
         if (liveMinions.isEmpty()) {
             throw new Exception('There are no alive minions')
@@ -119,9 +119,7 @@ node('python') {
 
                 // Evaluate the benchmark
                 salt.runSaltProcessStep(pepperEnv, minion, 'oscap.eval', [
-                    'xccdf', benchmarkFile, results_dir = resultsDir,
-                    profile = profile, xccdf_version = xccdfVersion,
-                    tailoring_id = xccdfTailoringId
+                    'xccdf', benchmarkFile, xccdfProfile, xccdfVersion, xccdfTailoringId, resultsDir
                 ])
 
                 // Attempt to upload the scanning results to the dashboard
