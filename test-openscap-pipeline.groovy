@@ -161,6 +161,7 @@ node('python') {
         }
     }
 
+/*  // Will be implemented later
     stage ('Attempt to upload results to an artifactory') {
         if (common.validInputParam('ARTIFACTORY_URL')) {
             for (minion in liveMinions) {
@@ -219,5 +220,6 @@ node('python') {
             common.warningMsg('ARTIFACTORY_URL was not given, skip uploading to artifactory')
         }
     }
+*/
 
 }
