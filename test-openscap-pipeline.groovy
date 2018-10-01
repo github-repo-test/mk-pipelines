@@ -153,13 +153,15 @@ node('python') {
                     "tailoring_id=${xccdfTailoringId}"
                 ])
 
-                salt.cmdRun(pepperEnv, minion, "tar -cf /tmp/openscap_results_${benchmarkName}.tar -C ${resultsBaseDir} .")
                 sh "mkdir -p ${artifactsDir}/${nodeShortName}"
-                encoded = salt.cmdRun(pepperEnv, minion, "cat /tmp/openscap_results_${benchmarkName}.tar", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
-                writeFile file: "${artifactsDir}/${nodeShortName}/openscap_results_${benchmarkName}.tar", text: encoded
+                //salt.cmdRun(pepperEnv, minion, "tar -cf /tmp/openscap_results_${benchmarkName}.tar -C ${resultsBaseDir} .")
+                ['report.html', 'results.xml'].each {
+                    fileContents = salt.cmdRun(pepperEnv, minion, "cat ${resultsDir}/${it}", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
+                    writeFile file: "{${scanUUID}${nodeShortName}_${benchmarkName}_${it}", text: fileContents
+                }
 
                 // Archive the build output artifacts
-                archiveArtifacts artifacts: "${artifactsDir}"
+                archiveArtifacts artifacts: "${artifactsDir}/*"
 
                 // Attempt to upload the scanning results to the dashboard
                 if (UPLOAD_TO_DASHBOARD.toBoolean()) {
