@@ -162,15 +162,15 @@ node('python') {
                 salt.cmdRun(pepperEnv, minion, "tar -cf /tmp/${archiveName} -C ${resultsBaseDir} .")
                 fileContents = salt.cmdRun(pepperEnv, minion, "cat /tmp/${archiveName}", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
 
-                sh "pwd;find ."
                 dir("${artifactsDir}/${scanUUID}/${nodeShortName}") {
-                    dir("${artifactsDir}") { sh "pwd;find ." }
-                    dir("${artifactsDir}/${scanUUID}") { sh "pwd;find ." }
                     sh "pwd;find ."
+                    common.infoMsg("Before contents")
                     sh 'find ..'
                     writeFile file: "${archiveName}", text: fileContents
+                    common.infoMsg("After contents")
                     sh 'find ..'
                     sh "tar --strip-components 1 -xf ${archiveName}; rm -f ${archiveName}"
+                    common.infoMsg("After extraction")
                     sh 'find ..'
                 }
 
