@@ -155,7 +155,7 @@ node('python') {
                     "tailoring_id=${xccdfTailoringId}"
                 ])
 
-                def archiveName = "${scanUUID}_${nodeShortName}_${benchmarkName}.tar.xz"
+                def archiveName = "${scanUUID}_${nodeShortName}_${benchmarkName}.tar"
                 salt.cmdRun(pepperEnv, minion, "tar -cf /tmp/${archiveName} -C ${resultsBaseDir} .")
                 fileContents = salt.cmdRun(pepperEnv, minion, "cat /tmp/${archiveName}", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
                 //sh "mkdir -p ${artifactsDir}/${scanUUID}/${nodeShortName}"
@@ -180,7 +180,7 @@ node('python') {
             }
         }
         sh 'pwd;ls -la'
-        sh "tar -cJf openscap.tar.xz ${artifactsDir}"
+        sh "tar -cJf openscap.tar.xz openscap"
 
         // Archive the build output artifacts
         archiveArtifacts artifacts: "*.xz"
