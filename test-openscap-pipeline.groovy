@@ -154,12 +154,13 @@ node('python') {
                 ])
 
                 def archiveName = "${scanUUID}_${nodeShortName}_${benchmarkName}.tar.xz"
-                salt.cmdRun(pepperEnv, minion, "tar -cJf /tmp/${archiveName} -C ${resultsBaseDir} .")
+                salt.cmdRun(pepperEnv, minion, "tar -cf /tmp/${archiveName} -C ${resultsBaseDir} .")
                 fileContents = salt.cmdRun(pepperEnv, minion, "cat /tmp/${archiveName}", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
                 //sh "mkdir -p ${artifactsDir}/${scanUUID}/${nodeShortName}"
                 dir("${artifactsDir}/${scanUUID}/${nodeShortName}") {
+                    common.infoMsg("Writing files to ${artifactsDir}/${scanUUID}/${nodeShortName}")
                     writeFile file: "${archiveName}", text: fileContents
-                    sh "tar --strip-components 1 -xJf ${archiveName}; rm -f ${archiveName}"
+                    sh "tar --strip-components 1 -xf ${archiveName}; rm -f ${archiveName}"
                 }
 
                 // Attempt to upload the scanning results to the dashboard
