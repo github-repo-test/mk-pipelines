@@ -110,7 +110,7 @@ node('python') {
     def scanUUID = UUID.randomUUID().toString()
 
     def artifactsArchiveName = "openscap-${scanUUID}.zip"
-    def resultsBaseDir = "/tmp/openscap/${scanUUID}"
+    def resultsBaseDir = "/var/log/openscap/${scanUUID}"
     def artifactsDir = "${env.WORKSPACE}/openscap/${scanUUID}/artifacts"
 
     def liveMinions
