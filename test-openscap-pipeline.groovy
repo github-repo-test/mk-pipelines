@@ -163,7 +163,7 @@ node('python') {
                 fileContents = salt.cmdRun(pepperEnv, minion, "cat /tmp/${archiveName}", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
 
                 dir("${artifactsDir}") { sh 'pwd; find .' }
-                dir("${artifactsDir}/${scanUUID}") { sh 'pwd; find .' }
+                dir("${artifactsDir}/${scanUUID}") { sh 'pwd; find ..' }
                 dir("${artifactsDir}/${scanUUID}/${nodeShortName}") {
                     sh "pwd; find ."
                     common.infoMsg("Before contents")
