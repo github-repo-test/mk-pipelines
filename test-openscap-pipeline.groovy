@@ -161,11 +161,10 @@ node('python') {
                 salt.cmdRun(pepperEnv, minion, "tar -cf /tmp/${archiveName} -C ${resultsBaseDir} .")
                 fileContents = salt.cmdRun(pepperEnv, minion, "cat /tmp/${archiveName}", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
 
-                sh "find ${artifactsDir}"
-                sh "find ${artifactsDir}/${scanUUID}"
                 sh "find ."
                 dir("${artifactsDir}/${scanUUID}/${nodeShortName}") {
                     pwd
+                    sh "find ."
                     sh 'find ..'
                     writeFile file: "${archiveName}", text: fileContents
                     sh 'find ..'
