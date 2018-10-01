@@ -169,7 +169,7 @@ node('python') {
                 }
 
                 // Remove archive which is not needed anymore
-                salt.runSaltProcessStep(pepperEnv, minion, 'file.remove', /tmp/${archiveName})
+                salt.runSaltProcessStep(pepperEnv, minion, 'file.remove', "/tmp/${archiveName}")
 
                 // Attempt to upload the scanning results to the dashboard
                 if (UPLOAD_TO_DASHBOARD.toBoolean()) {
