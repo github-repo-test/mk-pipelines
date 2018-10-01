@@ -115,6 +115,8 @@ node('python') {
 
     def liveMinions
 
+    deleteDir()
+
     stage ('Setup virtualenv for Pepper') {
         python.setupPepperVirtualenv(pepperEnv, SALT_MASTER_URL, SALT_MASTER_CREDENTIALS)
     }
