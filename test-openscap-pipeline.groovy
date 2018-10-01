@@ -153,11 +153,11 @@ node('python') {
                     "tailoring_id=${xccdfTailoringId}"
                 ])
 
+                def archiveName = "${scanUUID}_${nodeShortName}_${benchmarkName}.tar.xz"
+                salt.cmdRun(pepperEnv, minion, "tar -cJf /tmp/${archiveName} -C ${resultsBaseDir} .")
+                fileContents = salt.cmdRun(pepperEnv, minion, "cat /tmp/${archiveName}", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
                 //sh "mkdir -p ${artifactsDir}/${scanUUID}/${nodeShortName}"
                 dir("${artifactsDir}/${scanUUID}/${nodeShortName}") {
-                    def archiveName = "${scanUUID}_${nodeShortName}_${benchmarkName}.tar.xz"
-                    salt.cmdRun(pepperEnv, minion, "tar -cJf /tmp/${archiveName} -C ${resultsBaseDir} .")
-                    fileContents = salt.cmdRun(pepperEnv, minion, "cat /tmp/${archiveName}", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
                     writeFile file: "${archiveName}", text: fileContents
                     sh "tar --strip-components 1 -xJf ${archiveName}; rm -f ${archiveName}"
                 }
