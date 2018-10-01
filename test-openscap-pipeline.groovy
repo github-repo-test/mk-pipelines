@@ -164,7 +164,7 @@ node('python') {
 
                 sh "mkdir -p ${artifactsDir}/${scanUUID}/${nodeShortName}"
                 writeFile file: "${archiveName}", text: fileContents
-                sh "tar --strip-components 1 -xf ${archiveName} -C ${artifactsDir}/${scanUUID}/${nodeShortName}; rm -f ${archiveName}"
+                sh "tar --strip-components 1 -xf ${archiveName} --directory ${artifactsDir}/${scanUUID}/${nodeShortName}; rm -f ${archiveName}"
 
                 // Remove archive which is not needed anymore
                 salt.runSaltProcessStep(pepperEnv, minion, 'file.remove', "/tmp/${archiveName}")
