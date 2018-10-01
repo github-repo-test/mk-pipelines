@@ -161,12 +161,15 @@ node('python') {
                 salt.cmdRun(pepperEnv, minion, "tar -cf /tmp/${archiveName} -C ${resultsBaseDir} .")
                 fileContents = salt.cmdRun(pepperEnv, minion, "cat /tmp/${archiveName}", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
 
-                dir("${artifactsDir}/${scanUUID}/${nodeShortName}") {}
-                writeFile file: "${artifactsDir}/${scanUUID}/${nodeShortName}/${archiveName}", text: fileContents
-
+                sh 'find'
                 dir("${artifactsDir}/${scanUUID}/${nodeShortName}") {
+                    sh 'find'
+                    writeFile file: "${archiveName}", text: fileContents
                     sh "tar --strip-components 1 -xf ${archiveName}; rm -f ${archiveName}"
                 }
+
+                // Remove archive which is not needed anymore
+                salt.runSaltProcessStep(pepperEnv, minion, 'file.remove', /tmp/${archiveName})
 
                 // Attempt to upload the scanning results to the dashboard
                 if (UPLOAD_TO_DASHBOARD.toBoolean()) {
