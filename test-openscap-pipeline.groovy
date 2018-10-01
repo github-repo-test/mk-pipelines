@@ -135,7 +135,6 @@ node('python') {
             // Iterate oscap evaluation over the benchmarks
             for (benchmark in benchmarksAndProfilesArray) {
                 def (benchmarkFilePath, profile) = benchmark.tokenize(',').collect({it.trim()})
-                def nodeShortName = minion.tokenize('.')[0]
 
                 // Remove extension from the benchmark name
                 def benchmarkPathWithoutExtension = benchmarkFilePath.replaceFirst('[.][^.]+$', '')
@@ -148,6 +147,10 @@ node('python') {
 
                 def benchmarkFile = "${benchmarksDir}${benchmarkFilePath}"
 
+                def nodeShortName = minion.tokenize('.')[0]
+
+                def archiveName = "${scanUUID}_${nodeShortName}_${benchmarkName}.tar"
+
                 // Evaluate the benchmark
                 salt.runSaltProcessStep(pepperEnv, minion, 'oscap.eval', [
                     'xccdf', benchmarkFile, "results_dir=${resultsDir}",
@@ -155,17 +158,14 @@ node('python') {
                     "tailoring_id=${xccdfTailoringId}"
                 ])
 
-                def archiveName = "${scanUUID}_${nodeShortName}_${benchmarkName}.tar"
                 salt.cmdRun(pepperEnv, minion, "tar -cf /tmp/${archiveName} -C ${resultsBaseDir} .")
                 fileContents = salt.cmdRun(pepperEnv, minion, "cat /tmp/${archiveName}", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
-                //sh "mkdir -p ${artifactsDir}/${scanUUID}/${nodeShortName}"
+
+                dir("${artifactsDir}/${scanUUID}/${nodeShortName}") {}
+                writeFile file: "${artifactsDir}/${scanUUID}/${nodeShortName}/${archiveName}", text: fileContents
+
                 dir("${artifactsDir}/${scanUUID}/${nodeShortName}") {
-                    common.infoMsg("Writing files to ${artifactsDir}/${scanUUID}/${nodeShortName}")
-                    sh 'pwd;ls -la'
-                    writeFile file: "${archiveName}", text: fileContents
-                    sh 'pwd;ls -la'
                     sh "tar --strip-components 1 -xf ${archiveName}; rm -f ${archiveName}"
-                    sh 'pwd;ls -la'
                 }
 
                 // Attempt to upload the scanning results to the dashboard
@@ -179,7 +179,8 @@ node('python') {
                 }
             }
         }
-        sh 'pwd;ls -la'
+
+        // Prepare archive
         sh "tar -cJf openscap.tar.xz openscap"
 
         // Archive the build output artifacts
