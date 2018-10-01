@@ -130,6 +130,7 @@ node('python') {
 
         common.infoMsg("Scan UUID: ${scanUUID}")
 
+        sh "pwd;find ."
         for (minion in liveMinions) {
 
             // Iterate oscap evaluation over the benchmarks
