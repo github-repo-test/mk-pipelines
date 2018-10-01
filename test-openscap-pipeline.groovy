@@ -133,11 +133,12 @@ node('python') {
             // Iterate oscap evaluation over the benchmarks
             for (benchmark in benchmarksAndProfilesArray) {
                 def (benchmarkFilePath, profile) = benchmark.tokenize(',').collect({it.trim()})
+                def nodeShortName = minion.tokenize('.')[0]
 
                 // Remove extension from the benchmark name
                 def benchmarkPathWithoutExtension = benchmarkFilePath.replaceFirst('[.][^.]+$', '')
                 // And build resultsDir based on this path
-                def resultsDir = "${resultsBaseDir}/${minion.tokenize('.')[0]}/${benchmarkPathWithoutExtension}"
+                def resultsDir = "${resultsBaseDir}/${benchmarkPathWithoutExtension}"
 
                 def benchmarkFile = "${benchmarksDir}${benchmarkFilePath}"
 
@@ -148,8 +149,13 @@ node('python') {
                     "tailoring_id=${xccdfTailoringId}"
                 ])
 
+                salt.cmdRun(master, target, "tar -cf /tmp/openscap_results_${benchmarkPathWithoutExtension}.tar -C ${resultsBaseDir} .")
+                sh "mkdir -p ${artifactsDir}/${nodeShortName}"
+                encoded = salt.cmdRun(master, target, "cat /tmp/openscap_results_${benchmarkPathWithoutExtension}.tar", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
+                writeFile file: "${artifactsDir}/${nodeShortName}/openscap_results_${benchmarkPathWithoutExtension}.tar", text: encoded
+
                 // Archive the build output artifacts
-                archiveArtifacts artifacts: "${resultsDir}/*", excludes: "${resultsDir}/*.json"
+                archiveArtifacts artifacts: "${artifactsDir}/*"
 
                 // Attempt to upload the scanning results to the dashboard
                 if (UPLOAD_TO_DASHBOARD.toBoolean()) {
