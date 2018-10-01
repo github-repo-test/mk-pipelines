@@ -159,7 +159,7 @@ node('python') {
                 writeFile file: "${artifactsDir}/${nodeShortName}/openscap_results_${benchmarkName}.tar", text: encoded
 
                 // Archive the build output artifacts
-                archiveArtifacts artifacts: "${artifactsDir}/**/*.html"
+                archiveArtifacts artifacts: "${artifactsDir}/**/*.tar"
 
                 // Attempt to upload the scanning results to the dashboard
                 if (UPLOAD_TO_DASHBOARD.toBoolean()) {
