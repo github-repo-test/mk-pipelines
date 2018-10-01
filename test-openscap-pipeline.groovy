@@ -155,14 +155,12 @@ node('python') {
 
                 sh "mkdir -p ${artifactsDir}/${nodeShortName}"
                 //salt.cmdRun(pepperEnv, minion, "tar -cf /tmp/openscap_results_${benchmarkName}.tar -C ${resultsBaseDir} .")
-                ['report.html', 'results.xml'].each {
-                    fileContents = salt.cmdRun(pepperEnv, minion, "cat ${resultsDir}/${it}", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
-                    writeFile file: "{${scanUUID}${nodeShortName}_${benchmarkName}_${it}", text: fileContents
-                }
+                fileContents = salt.cmdRun(pepperEnv, minion, "cat /tmp/${scanUUID}_${nodeShortName}_${benchmarkName}.tar", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
+                writeFile file: "${scanUUID}_${nodeShortName}_${benchmarkName}.tar", text: fileContents
 
                 // Archive the build output artifacts
                 //archiveArtifacts artifacts: "${artifactsDir}/*"
-                archiveArtifacts artifacts: "*.html"
+                archiveArtifacts artifacts: "*.tar"
 
                 // Attempt to upload the scanning results to the dashboard
                 if (UPLOAD_TO_DASHBOARD.toBoolean()) {
