@@ -137,6 +137,10 @@ node('python') {
 
                 // Remove extension from the benchmark name
                 def benchmarkPathWithoutExtension = benchmarkFilePath.replaceFirst('[.][^.]+$', '')
+
+                // Get benchmark name
+                def benchmarkName = benchmarkPathWithoutExtension.tokenize('/')[-1]
+
                 // And build resultsDir based on this path
                 def resultsDir = "${resultsBaseDir}/${benchmarkPathWithoutExtension}"
 
@@ -149,7 +153,7 @@ node('python') {
                     "tailoring_id=${xccdfTailoringId}"
                 ])
 
-                salt.cmdRun(pepperEnv, minion, "tar -cf /tmp/openscap_results_${benchmarkPathWithoutExtension}.tar -C ${resultsBaseDir} .")
+                salt.cmdRun(pepperEnv, minion, "tar -cf /tmp/openscap_results_${benchmarkName}.tar -C ${resultsBaseDir} .")
                 sh "mkdir -p ${artifactsDir}/${nodeShortName}"
                 encoded = salt.cmdRun(master, target, "cat /tmp/openscap_results_${benchmarkPathWithoutExtension}.tar", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
                 writeFile file: "${artifactsDir}/${nodeShortName}/openscap_results_${benchmarkPathWithoutExtension}.tar", text: encoded
