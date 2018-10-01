@@ -155,8 +155,8 @@ node('python') {
 
                 salt.cmdRun(pepperEnv, minion, "tar -cf /tmp/openscap_results_${benchmarkName}.tar -C ${resultsBaseDir} .")
                 sh "mkdir -p ${artifactsDir}/${nodeShortName}"
-                encoded = salt.cmdRun(pepperEnv, minion, "cat /tmp/openscap_results_${benchmarkPathWithoutExtension}.tar", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
-                writeFile file: "${artifactsDir}/${nodeShortName}/openscap_results_${benchmarkPathWithoutExtension}.tar", text: encoded
+                encoded = salt.cmdRun(pepperEnv, minion, "cat /tmp/openscap_results_${benchmarkName}.tar", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
+                writeFile file: "${artifactsDir}/${nodeShortName}/openscap_results_${benchmarkName}.tar", text: encoded
 
                 // Archive the build output artifacts
                 archiveArtifacts artifacts: "${artifactsDir}/*"
