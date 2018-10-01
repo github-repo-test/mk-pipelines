@@ -137,7 +137,7 @@ node('python') {
                 // Remove extension from the benchmark name
                 def benchmarkPathWithoutExtension = benchmarkFilePath.replaceFirst('[.][^.]+$', '')
                 // And build resultsDir based on this path
-                def resultsDir = "${resultsBaseDir}/${minion}/${benchmarkPathWithoutExtension}"
+                def resultsDir = "${resultsBaseDir}/${minion.tokenize('.')[0]}/${benchmarkPathWithoutExtension}"
 
                 def benchmarkFile = "${benchmarksDir}${benchmarkFilePath}"
 
