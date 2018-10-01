@@ -154,9 +154,10 @@ node('python') {
                 ])
 
                 sh "mkdir -p ${artifactsDir}/${nodeShortName}"
-                //salt.cmdRun(pepperEnv, minion, "tar -cf /tmp/openscap_results_${benchmarkName}.tar -C ${resultsBaseDir} .")
-                fileContents = salt.cmdRun(pepperEnv, minion, "cat /tmp/${scanUUID}_${nodeShortName}_${benchmarkName}.tar", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
-                writeFile file: "${scanUUID}_${nodeShortName}_${benchmarkName}.tar", text: fileContents
+                def archiveName = "${scanUUID}_${nodeShortName}_${benchmarkName}.tar"
+                salt.cmdRun(pepperEnv, minion, "tar -cf /tmp/${archiveName} -C ${resultsBaseDir} .")
+                fileContents = salt.cmdRun(pepperEnv, minion, "cat /tmp/${archiveName}", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
+                writeFile file: "${archiveName}", text: fileContents
 
                 // Archive the build output artifacts
                 //archiveArtifacts artifacts: "${artifactsDir}/*"
