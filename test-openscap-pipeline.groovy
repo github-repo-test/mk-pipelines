@@ -163,15 +163,15 @@ node('python') {
                 fileContents = salt.cmdRun(pepperEnv, minion, "cat /tmp/${archiveName}", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
 
                 dir("${artifactsDir}/${scanUUID}/${nodeShortName}") {
-                    sh "pwd;find ."
+                    sh "pwd; find ."
                     common.infoMsg("Before contents")
-                    sh 'find ..'
+                    sh 'pwd; find ..'
                     writeFile file: "${archiveName}", text: fileContents
                     common.infoMsg("After contents")
-                    sh 'find ..'
+                    sh 'pwd; find ..'
                     sh "tar --strip-components 1 -xf ${archiveName}; rm -f ${archiveName}"
                     common.infoMsg("After extraction")
-                    sh 'find ..'
+                    sh 'pwd; find ..'
                 }
 
                 // Remove archive which is not needed anymore
