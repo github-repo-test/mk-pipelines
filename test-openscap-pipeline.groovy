@@ -149,7 +149,7 @@ node('python') {
                 ])
 
                 // Archive the build output artifacts
-                archiveArtifacts artifacts: "${resultsDir}/*.html", excludes: "${resultsDir}/*.json"
+                archiveArtifacts artifacts: "${resultsDir}/*", excludes: "${resultsDir}/*.json"
 
                 // Attempt to upload the scanning results to the dashboard
                 if (UPLOAD_TO_DASHBOARD.toBoolean()) {
