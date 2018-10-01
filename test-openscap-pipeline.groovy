@@ -111,7 +111,7 @@ node('python') {
 
     def artifactsArchiveName = "openscap-${scanUUID}.zip"
     def resultsBaseDir = "/var/log/openscap/${scanUUID}"
-    def artifactsDir = "${env.WORKSPACE}/openscap/${scanUUID}/artifacts"
+    def artifactsDir = "${env.WORKSPACE}/openscap"
 
     def liveMinions
 
@@ -153,15 +153,14 @@ node('python') {
                     "tailoring_id=${xccdfTailoringId}"
                 ])
 
-                sh "mkdir -p ${artifactsDir}/${nodeShortName}"
-                def archiveName = "${scanUUID}_${nodeShortName}_${benchmarkName}.tar"
-                salt.cmdRun(pepperEnv, minion, "tar -cf /tmp/${archiveName} -C ${resultsBaseDir} .")
-                fileContents = salt.cmdRun(pepperEnv, minion, "cat /tmp/${archiveName}", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
-                writeFile file: "${archiveName}", text: fileContents
-
-                // Archive the build output artifacts
-                //archiveArtifacts artifacts: "${artifactsDir}/*"
-                archiveArtifacts artifacts: "*.tar"
+                //sh "mkdir -p ${artifactsDir}/${scanUUID}/${nodeShortName}"
+                dir("${artifactsDir}/${scanUUID}/${nodeShortName}") {
+                    def archiveName = "${scanUUID}_${nodeShortName}_${benchmarkName}.tar.xz"
+                    salt.cmdRun(pepperEnv, minion, "tar -cJf /tmp/${archiveName} -C ${resultsBaseDir} .")
+                    fileContents = salt.cmdRun(pepperEnv, minion, "cat /tmp/${archiveName}", true, null, false)['return'][0].values()[0].replaceAll('Salt command execution success', '')
+                    writeFile file: "${archiveName}", text: fileContents
+                    sh "tar --strip-components 1 -xJf ${archiveName}; rm -f ${archiveName}"
+                }
 
                 // Attempt to upload the scanning results to the dashboard
                 if (UPLOAD_TO_DASHBOARD.toBoolean()) {
@@ -174,6 +173,10 @@ node('python') {
                 }
             }
         }
+        sh "tar -cJf openscap.tar.xz ${artifactsDir}"
+
+        // Archive the build output artifacts
+        archiveArtifacts artifacts: "*.xz"
     }
 
 /*  // Will be implemented later
