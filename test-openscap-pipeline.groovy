@@ -137,7 +137,7 @@ node('python') {
                 // Remove extension from the benchmark name
                 def benchmarkPathWithoutExtension = benchmarkFilePath.replaceFirst('[.][^.]+$', '')
                 // And build resultsDir based on this path
-                def resultsDir = "${resultsBaseDir}/${benchmarkPathWithoutExtension}"
+                def resultsDir = "${resultsBaseDir}/${minion}/${benchmarkPathWithoutExtension}"
 
                 def benchmarkFile = "${benchmarksDir}${benchmarkFilePath}"
 
@@ -147,6 +147,9 @@ node('python') {
                     "profile=${profile}", "xccdf_version=${xccdfVersion}",
                     "tailoring_id=${xccdfTailoringId}"
                 ])
+
+                // Archive the build output artifacts
+                archiveArtifacts artifacts: "${resultsDir}/*.html", excludes: "${resultsDir}/*.json"
 
                 // Attempt to upload the scanning results to the dashboard
                 if (UPLOAD_TO_DASHBOARD.toBoolean()) {
